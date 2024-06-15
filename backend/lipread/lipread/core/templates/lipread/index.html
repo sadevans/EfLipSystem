@@ -1,0 +1,22 @@
+<h1>LipReading</h1>
+<form method="post" enctype="multipart/form-data" style="margin-top: 50px; margin-bottom: 30px;">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit" id="btnUpload" class="btn btn-primary">Загрузить</button>
+</form>
+
+{% if video_url %}
+    <h2>Загруженное видео</h2>
+    <video width="320" height="240" controls>
+        <source src="{{ video_url }}" type="video/mp4">
+        
+    </video>
+{% endif %}
+
+{% if out_video_url %}
+    <h2>Обработанное видео</h2>
+    <video width="320" height="240" controls>
+        <source src="{{ out_video_url }}" type="video/mp4">
+        
+    </video>
+{% endif %}

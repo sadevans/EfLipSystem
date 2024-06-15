@@ -1,0 +1,51 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://allfont.net/allfont.css?fonts=comfortaa" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/web_app.css' %}">  
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <!-- <title>LipRead</title> -->
+</head>
+<body>
+
+    <!-- <h1>LipRead</h1> -->
+    <!-- <form id="uploadForm" method="post" enctype="multipart/form-data"> -->
+        <!-- {% csrf_token %} -->
+        <!-- {{ form }} -->
+        <!-- <input type="file" id="videoFile" name="video" style="display: none;"> -->
+        <!-- <button type="button" id="uploadButton">Upload</button> -->
+        <!-- <button type="submit">Upload</button> -->
+    <!-- </form> -->
+    <div class="left-panel">
+        <form id="uploadForm" method="post" enctype="multipart/form-data" style="display: none;">
+            {% csrf_token %}
+            <input type="file" id="videoFile" name="video" style="display: none;" accept=".mp4"> 
+        </form>
+        <div class="actionsButtons">
+            <button type="button" id="uploadButton">загрузить</button>
+            <button type="button" id="recordButton">записать</button>
+        </div>
+    </div>
+    <div class="right-panel">
+        <div id="uploadedVideoContainer" class="VideoContainer" style="display: none;">
+            <video id="uploadedVideo" controls></video>
+        </div>
+        <div id="liveVideoContainer" class="VideoContainer"style="display: none;">
+            <video id="liveVideo" autoplay muted></video> 
+            <button id="startRecord" class="controlButton" style="display: block;"><i class="fas fa-play"></i></button>
+            <button id="endRecord" class="controlButton" style="display: block;"><i class="fas fa-stop"></i></button>
+            <!-- <button id="startStream" style="display: block;">Start Stream</button>
+            <button id="stopStream" style="display: block;">Stop Stream</button> -->
+        </div>
+
+        <div id="processedVideoContainer" class="VideoContainer" style="display: none;">
+            <video id="processedVideo" controls></video>
+        </div>
+    </div>
+    <script type="text/javascript" src="{% static 'assets/web_app.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+
+
+body {
+    font-family: 'Comfortaa', sans-serif;
+    background-color: #132043;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  .left-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    height: 100%;
+  }
+  
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    justify-content: space-between;
+
+    width: 50%;
+    height: 100%;
+  }
+  
+    /* button#uploadButton, button#recordButton { */
+    button{
+        background-color: #1F4172;
+        color: #eeee;
+        font-family: 'Comfortaa', sans-serif;
+        text-align: center;
+        font-size: 1.5em;
+        padding: 0.8em 1.6em;
+        padding: 10px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s, color 0.3s;
+
+        /* transition: background-color 0.3s, color 0.3s; */
+    }
+    #uploadButton, #recordButton {
+        width: 8em;
+        height: 8em;
+        /* transition: background-color 0.3s, color 0.3s; */
+    }
+
+    button:hover {
+        background-color: #F1B4BB;
+        color: #1F4172;
+      }
+    
+  
+    .VideoContainer {
+    position: relative;
+    width: 100%;
+    height: 50%;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+    }
+    
+    /* #liveVideoContainer {
+    height: 40%;
+    } */
+    
+    #processedVideoContainer {
+    margin-top: 30px;
+    }
+    
+    .VideoContainer video {
+    width: 90%;
+    height: 90%;
+    object-fit: cover;
+    border-radius: 30px;
+    }
+
+    #liveVideo{
+        height: 90%;
+    }
+
+
+  .controlButton {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 40px;
+    margin-right: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding-left: 30px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* transition: color 0.3s; */
+
+  }
+  
+  .controlButton i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    /* transition: color 0.3s; */
+  }
+  
+  .controlButton:hover {
+    color: #1F4172;
+  }

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LipRead</title>
+</head>
+<body>
+    <h1>LipRead</h1>
+    <form id="uploadForm" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Upload</button>
+    </form>
+
+    <button id="recordButton">Record Video</button>
+    <div id="uploadedVideoContainer" style="display: none;">
+        <h2 id="mode"> </h2>
+        <video id="uploadedVideo" width="640" height="480" controls></video>
+    </div>
+    <div id="liveVideoContainer" style="display: none;">
+        <h2 id="mode"> </h2>
+        <video id="liveVideo" width="640" height="480" autoplay muted></video> 
+        <button id="startRecord" style="display: block;">Start Record</button>
+        <button id="endRecord" style="display: block;">End Record</button>
+    </div>
+
+    <div id="processedVideoContainer" style="display: none;">
+        <h2>Processed Video</h2>
+        <video id="processedVideo" width="640" height="480" controls></video>
+    </div>
+
+    <script>
+        let recorder;
+        let recordedChunks = []
+
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            document.getElementById("mode").textContent = "Uploaded Video";
+            event.preventDefault();
+            const formData = new FormData(this);
+            const videoLiveElement = document.getElementById('liveVideo');
+            const stream = videoLiveElement.srcObject;
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                document.getElementById('liveVideoContainer').style.display = 'none';
+                videoLiveElement.srcObject = null;
+            }
+
+            fetch('/upload_video/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.video_url) {
+                    const uploadedVideo = document.getElementById('uploadedVideo');
+                    document.getElementById('processedVideoContainer').style.display = 'none';
+                    uploadedVideo.src = data.video_url;
+                    document.getElementById('uploadedVideoContainer').style.display = 'block';
+                } else {
+                    console.error('Error:', data.error);
+                }
+                if (data.filename) {processVideo(data.filename)}
+            })
+            .catch(error => console.error('Error uploading video:', error));
+        });
+
+        function processVideo(filename){
+            fetch(`/process_video/?filename=${filename}`, {
+            method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.out_video_url) {
+                    const processedVideo = document.getElementById('processedVideo');
+                    processedVideo.src = data.out_video_url;
+                    document.getElementById('processedVideoContainer').style.display = 'block';
+                } else {
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => console.error('Error processing video:', error))
+
+        }
+
+        async function startVideoPreview() {
+            console.log('IM HERE')
+            document.getElementById('uploadedVideoContainer').style.display = 'none';
+            document.getElementById('processedVideoContainer').style.display = 'none';
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true});
+                const videoElement = document.getElementById('liveVideo');
+                videoElement.srcObject = stream;
+                videoElement.play();
+
+                recorder = new MediaRecorder(stream);
+                recorder.ondataavailable = (event) => {
+                    console.log('data:', event.data)
+                    recordedChunks.push(event.data);
+                };
+
+                recorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    console.log('BLOB: ', blob);
+                    sendBlobToServer(blob); 
+                };
+
+                console.log('audio: ', stream.getAudioTracks());
+                document.getElementById('liveVideoContainer').style.display = 'block';
+            } catch (error) {
+                console.error('Ошибка при доступе к камере:', error);
+            }
+        }
+
+        const recordButton = document.getElementById('recordButton');
+        recordButton.addEventListener('click', startVideoPreview);
+        
+        document.getElementById('startRecord').addEventListener('click', () => {
+            if (recorder && recorder.state === 'inactive') {
+                recordedChunks = [];
+                recorder.start();
+                console.log('Recording started');
+                console.log(recorder.state);
+                console.log(recorder);
+            }
+        });
+
+
+        document.getElementById('endRecord').addEventListener('click', () => {
+            if (recorder && recorder.state === 'recording') {
+                recorder.stop();
+                console.log(recordedChunks);
+                console.log('Recording stopped');
+                console.log(recorder.state);
+                console.log(recorder);
+            }
+        });
+
+        function sendBlobToServer(blob) {
+            console.log('in send on server function');
+            var csrftoken = getCookie('csrftoken');
+
+            const formData = new FormData();
+            formData.append('video', blob, 'recorded-video.webm');
+
+            fetch('/get_video/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                body: formData // Send FormData as the body
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Handle response from the server
+            })
+            .catch(error => {
+                console.error('Upload failed:', error);
+            });
+        }
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
