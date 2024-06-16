@@ -34,3 +34,5 @@
 
 
 Диаграмма последовательности работы веб-приложения 
+![uml_web_app (1)](https://github.com/sadevans/EfLipSystem/assets/82286355/0554a098-7a8d-43e1-9862-613adc4374a5)
+
