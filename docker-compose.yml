@@ -1,0 +1,15 @@
+version: '3'
+services:
+  lipreading:
+    image: lipread:1.0
+    ports:
+      - "8080:8080"
+    entrypoint: [ "python", "backend/lipread/manage.py", "runserver", "0.0.0.0:8080" ]
+    environment:
+      - INTERNAL_WEIGHT_PATH
+      - INTERNAL_CONFIG_PATH
+    volumes:
+      - ./model_zoo/epoch=8.ckpt:/usr/local/lib/python3.8/site-packages/model_zoo/epoch=8.ckpt:ro
+      # - ./model_zoo/config.yaml:${INTERNAL_CONFIG_PATH}:ro     
+
+

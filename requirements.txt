@@ -7,3 +7,4 @@ pytz==2024.1
 mediapipe==0.10.11
 scikit-image
 omegaconf==2.3.0
+ffmpeg

@@ -3,6 +3,7 @@ import torch
 import torchvision
 import torchaudio
 import numpy as np
+import os
 # import matplotlib.pyplot as plt
 import sys
 from omegaconf import OmegaConf
@@ -21,12 +22,18 @@ class InferencePipeline(torch.nn.Module):
         super(InferencePipeline, self).__init__()
         self.modality="video"
         dir = '/'.join(current_file_directory.split('/')[:-2])
-        with open(f"{dir}/scripts/configs/config.yaml", 'r') as file:
-            cfg = OmegaConf.load(file)
+        if len(os.environ.get("INTERNAL_CONFIG_PATH")) > 1:
+            with open(os.environ.get("INTERNAL_CONFIG_PATH")) as file:
+                cfg = OmegaConf.load(file)
+        else:
+            with open(f"{dir}/scripts/configs/config.yaml", 'r') as file:
+                cfg = OmegaConf.load(file)
         self.dataloader = VSRDataLoader(subset="test", convert_gray=False)
         self.modelmodule = ModelModule(cfg, mode="infer")
-
-        cfg.pretrained_model_path = f'{dir}/model_zoo/epoch=8.ckpt'
+        if len(os.environ.get("INTERNAL_WEIGHT_PATH")) > 1:
+            cfg.pretrained_model_path = os.environ.get("INTERNAL_WEIGHT_PATH")
+        else:
+            cfg.pretrained_model_path = f'{dir}/model_zoo/epoch=8.ckpt'
         self.modelmodule.load_state_dict(torch.load(cfg.pretrained_model_path, map_location=lambda storage, loc: storage)["state_dict"])
 
         self.detector = Detector()
@@ -60,12 +67,11 @@ class InferencePipeline(torch.nn.Module):
     
 
     def load_data(self, filename: str):
-        video_frames, fps, audio_frames, sample_rate = None, None, None, None
+        video_frames, fps = None, None
         if self.modality in ['video', 'audiovisual']:
             video_frames, fps = self.load_video(filename)
-            audio_frames, sample_rate = self.load_audio(filename)
         print("SHAPE VIDEO FRAMES: ", video_frames.shape)
-        return video_frames, fps, audio_frames, sample_rate
+        return video_frames, fps
 
 
     def load_audio(self, data_filename):
@@ -80,7 +86,7 @@ class InferencePipeline(torch.nn.Module):
 
 
     def process_input_file(self, filename:str, save: bool = True, save_file_name: str = './out.mp4'):
-        video_frames, fps, audio_frames, sample_rate = self.load_data(filename)
+        video_frames, fps = self.load_data(filename)
         landmarks, bboxes = None, None
         if self.modality in ['video', 'audiovisual']:
             landmarks, bboxes = self.detector.detect(video_frames)

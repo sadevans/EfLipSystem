@@ -28,6 +28,13 @@ from .forms import VideoUploadForm
 from pipelines.pipelines import InferencePipeline
 from pipelines.utils.utils import save2vid
 
+import logging
+logging.basicConfig(
+                    format = '%(asctime)s [%(name)-20s] %(levelname)-8s %(message)s',
+                    level=logging.DEBUG)
+logger = logging.getLogger('views.py')
+logger.setLevel(logging.DEBUG)
+
 # from pipelines.pipelines import InferencePipeline
 BUFFER_SIZE = 4*30
 
@@ -94,7 +101,8 @@ def get_video(request):
             subprocess.run(command, check=True)
             os.remove(webm_path)
             return JsonResponse({'message': 'Video uploaded and saved successfully!', 'filename': mp4_filename})
-        except:
+        except Exception as e:
+            logging.error(f"Error occured {e.message} {e.args}")
             mp4_filename = None
             return JsonResponse({'message': 'Video uploaded but cannot saved successfully!', 'filename': mp4_filename})
     else:
