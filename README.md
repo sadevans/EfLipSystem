@@ -9,13 +9,13 @@
 ## Установка зависимостей
 Для того, чтобы установить необходимую среду разработки, необходимо:
 
-### 1. 
-Собрать docker-image следующей командой:
+### 1. Собрать docker-image следующей командой
+
 ```bash
 docker build -t lipread:latest .
 ```
-### 2. 
-Запустить docker-compose проект:
+### 2. Запустить docker-compose проект
+
 ```bash
 docker compose --env-file .env-file up -d
 ```
