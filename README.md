@@ -47,7 +47,7 @@
 Модель состоит из блока 3D сверточной сети, отмасштабированной EfficientNetV2, энкодера трансформера и блока временной сверточной сети (TCN). Розовым на рисунке обозначена внешняя часть сети (frontend), выполняющая извлечение признакв, оранжевым - внутренняя часть сети (backend), отвечающая за обработку признаков.
 
 Модель предсказывает логарифм вероятности принадлежности произнесенного на видео слова к одному из 500 классов, представленных в датасете LRW. 
-Подробнее про модель можно посмотреть вот тут: https://github.com/sadevans/EfLipReading . В репозитории представлена реализация [статьи](https://www.researchgate.net/publication/360794222_Accurate_and_Resource-Efficient_Lipreading_with_Efficientnetv2_and_Transformers?enrichId=rgreq-f863c780260845c92418bc773235cd22-XXX&enrichSource=Y292ZXJQYWdlOzM2MDc5NDIyMjtBUzoxMTQzMTI4MTA5NTk5NTA2N0AxNjY4MDY3MjI5NDM5&el=1_x_2&_esc=publicationCoverPdf) (открытый код модели отсутсвует).
+Подробнее про модель можно посмотреть вот тут: https://github.com/sadevans/EfLipReading . В репозитории представлена реализация [статьи](https://www.researchgate.net/publication/360794222_Accurate_and_Resource-Efficient_Lipreading_with_Efficientnetv2_and_Transformers?enrichId=rgreq-f863c780260845c92418bc773235cd22-XXX&enrichSource=Y292ZXJQYWdlOzM2MDc5NDIyMjtBUzoxMTQzMTI4MTA5NTk5NTA2N0AxNjY4MDY3MjI5NDM5&el=1_x_2&_esc=publicationCoverPdf) (открытый код модели отсутсвовал, мною все было реализовано с нуля).
 
 ### Обработка результирующего видео
 На этом этапе на исходном видео выделяется лицо обнаруженного человека в boundind box (который мы сохранили на первом этапе). Также для демонстрации на исходное видео накладывается область и текст, предсказанный моделью.
@@ -55,4 +55,3 @@
 ## Диаграмма последовательности работы веб-приложения
 
 ![uml_web_app (1)](https://github.com/sadevans/EfLipSystem/assets/82286355/0554a098-7a8d-43e1-9862-613adc4374a5)
-
