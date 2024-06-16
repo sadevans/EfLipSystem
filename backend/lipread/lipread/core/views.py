@@ -57,8 +57,8 @@ def process_video(request):
         filename = request.GET.get('filename')
         fs = FileSystemStorage()
         uploaded_file_path = fs.path(filename)
-        config_file = "/home/sadevans/space/personal/LRSystem/config/LRS3_V_WER19.1.ini"
-        pipeline = InferencePipeline(config_file)
+        # config_file = ""
+        pipeline = InferencePipeline()
         name_out_file = os.path.join(settings.MEDIA_ROOT,filename[:-4]+'_out.mp4')
         
         transcript = pipeline.process_input_file(filename=uploaded_file_path, save=True, save_file_name=name_out_file)
@@ -125,11 +125,12 @@ def receive_frame(request):
 
 
 class StreamHandler:
+
     def __init__(self):
         self.frames_buffer = [] # Global list to store frames
         self.frames_to_process= []
-        config_file = "/home/sadevans/space/personal/LRSystem/config/LRS3_V_WER19.1.ini"
-        self.pipeline = InferencePipeline(config_file)
+        # config_file = "/home/sadevans/space/personal/LRSystem/config/LRS3_V_WER19.1.ini"
+        self.pipeline = InferencePipeline()
         self.fps = 30
         # self.frames_buffer = Queue()  # Queue for gathering incoming frames
         # self.processing_lock = Lock()

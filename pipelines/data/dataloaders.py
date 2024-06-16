@@ -4,7 +4,7 @@ import torch
 import torchvision
 import numpy as np
 
-class AVSRDataLoader:
+class VSRDataLoader:
     def __init__(self, modality="video", detector="mediapipe", subset = "train", transform = True, convert_gray=True):
         self.modality = modality
         self.detector_type = detector
@@ -12,10 +12,10 @@ class AVSRDataLoader:
         self.subset = subset
         
         if self.detector_type == "mediapipe":
-            from  detectors.mediapipe.processing import VideoHandler
-            from  transforms import VideoTransform
-            from detectors.mediapipe.detector import Detector
-            self.video_transform = VideoTransform(subset=self.subset)
+            from  pipelines.detectors.mediapipe.processing import VideoHandler
+            from  pipelines.data.transforms import VideoTransform
+            from pipelines.detectors.mediapipe.detector import Detector
+            self.video_transform = VideoTransform()
             self.video_handler = VideoHandler(convert_gray=convert_gray)
             self.detctor = Detector()
 

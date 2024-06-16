@@ -9,24 +9,23 @@ from omegaconf import OmegaConf
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from data.dataloaders import AVSRDataLoader
-from detectors.mediapipe.detector import Detector
-from .utils.utils import overlay_roi, save2vid
+from pipelines.data.dataloaders import VSRDataLoader
+from pipelines.detectors.mediapipe.detector import Detector
+from pipelines.utils.utils import overlay_roi, save2vid
 from model.EfLipReading.model.model_module import ModelModule
+import hydra
 current_file_directory = os.path.abspath(__file__)
 
 
 class InferencePipeline(torch.nn.Module):
-    def __init__(self, config_filename, detector="mediapipe", face_track=False, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+    def __init__(self, detector="mediapipe", face_track=False, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):
         super(InferencePipeline, self).__init__()
-        print('in init')
-        # config = ConfigParser()
-        # config.read(f"{'/'.join(current_file_directory.split('/')[:-2])}/model/EfLipReading/configs/config.yaml")
+        self.modality="video"
         dir = '/'.join(current_file_directory.split('/')[:-2])
         with open(f"{dir}/model/EfLipReading/configs/config.yaml", 'r') as file:
             cfg = OmegaConf.load(file)
-        self.dataloader = AVSRDataLoader(subset="test", convert_gray=False)
-        self.modelmodule = ModelModule(cfg)
+        self.dataloader = VSRDataLoader(subset="test", convert_gray=False)
+        self.modelmodule = ModelModule(cfg, mode="infer")
 
         cfg.pretrained_model_path = f'{dir}/model_zoo/epoch=8.ckpt'
         self.modelmodule.load_state_dict(torch.load(cfg.pretrained_model_path, map_location=lambda storage, loc: storage)["state_dict"])
@@ -66,7 +65,7 @@ class InferencePipeline(torch.nn.Module):
         if self.modality in ['video', 'audiovisual']:
             video_frames, fps = self.load_video(filename)
             audio_frames, sample_rate = self.load_audio(filename)
-
+        print("SHAPE VIDEO FRAMES: ", video_frames.shape)
         return video_frames, fps, audio_frames, sample_rate
 
 
@@ -86,17 +85,7 @@ class InferencePipeline(torch.nn.Module):
         landmarks, bboxes = None, None
         if self.modality in ['video', 'audiovisual']:
             landmarks, bboxes = self.detector.detect(video_frames)
-        data = self.dataloader.process_data(video_frames=video_frames, audio_frames=audio_frames, landmarks=landmarks, sample_rate=sample_rate)
-
-        # BATCH REALIZATION
-        # batch_size = int(fps)
-        # num_batches = len(data) // batch_size
-        # transcripts = []
-        # for i in range(0, data.shape[1], batch_size):
-        #     batch = data[:, i:i+batch_size-2,:,:]
-        #     transcripts.append(self.model.infer(batch))
-        # print(transcripts)
-
+        data = self.dataloader.process_data(video_frames=video_frames, landmarks=landmarks)
         transcript = self.modelmodule(data)
         
         if landmarks is not None:
@@ -118,13 +107,4 @@ class InferencePipeline(torch.nn.Module):
         if landmarks is not None:
             print(video_frames.shape, self.dataloader.color_roi.shape)
             output_video = overlay_roi(video_frames, self.dataloader.color_roi.permute(0,2,3,1).numpy(), bboxes)
-        # print('TRANSCRIPT: ', transcript)
         return transcript, output_video
-
-
-
-
-if __name__ == "__main__":
-    inference = InferencePipeline("/home/sadevans/space/personal/LRSystem/config/config.ini")
-    path = "/home/sadevans/space/personal/LRSystem/autoavsr_demo_video.mp4"
-    new = inference.process_input_file(path)

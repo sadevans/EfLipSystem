@@ -15,10 +15,12 @@ setup(
     include_package_data=True,
     package_data= {
         # all .dat files at any package depth
-        "model.EfLipReading.configs": ['**/*.ini', '**/*.yml', ],
-        "model.EfLipReading.model.labels": ['**/*.ini', '**/*.yml', ],
-        "model.EfLipReading.data.detectors.mediapipe": ['**/*.ini', '**/*.yml', '**/*.npy'],
-        "pipelines.detectors.mediapipe": ['**/*.ini', '**/*.yml', '**/*.npy'],
+        "model.EfLipReading.configs": ['**/*.yaml', '*.yaml', 'data/dataset/*.yaml', '**/**/*.yaml'],
+        "model.EfLipReading.model.labels": ['**/*.yaml', '*.yaml', '**/**/*.yaml', '**/**/*.yaml'],
+        "model.EfLipReading.data.detectors.mediapipe": ['**/*.yaml', '**/*.npy', 'detector/*.npy', '*.npy',],
+        "pipelines.detectors.mediapipe": ['**/*.yaml', '**/*.npy', '*.npy'],
+        "model_zoo": ['**/*.ckpt', '**/**/*.ckpt', '*.ckpt'],
+
         # into the data folder (being into a module) but w/o the init file
     },
     python_requires=">=3.8",

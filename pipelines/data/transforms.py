@@ -13,7 +13,7 @@ class FunctionalModule(torch.nn.Module):
 
 
 class VideoTransform:
-    def __init__(self, speed_rate=1):
+    def __init__(self, speed_rate=1.2):
         # if subset == "val" or subset == "test":
         self.pipeline = torch.nn.Sequential(
             # FunctionalModule(lambda x: x.permute(0, 3, 1, 2)),
@@ -24,7 +24,7 @@ class VideoTransform:
             FunctionalModule(lambda x: x.permute(3, 0, 1, 2)),
             FunctionalModule(lambda x: x / 255.),
             torchvision.transforms.CenterCrop(88),
-            torchvision.transforms.Normalize(0.421, 0.165),
+            torchvision.transforms.Normalize(0.4161, 0.1688),
         )
 
     def __call__(self, sample):
