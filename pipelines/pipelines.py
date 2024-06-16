@@ -12,8 +12,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from pipelines.data.dataloaders import VSRDataLoader
 from pipelines.detectors.mediapipe.detector import Detector
 from pipelines.utils.utils import overlay_roi, save2vid
-from model.EfLipReading.model.model_module import ModelModule
-import hydra
+from scripts.model.model_module import ModelModule
 current_file_directory = os.path.abspath(__file__)
 
 
@@ -22,7 +21,7 @@ class InferencePipeline(torch.nn.Module):
         super(InferencePipeline, self).__init__()
         self.modality="video"
         dir = '/'.join(current_file_directory.split('/')[:-2])
-        with open(f"{dir}/model/EfLipReading/configs/config.yaml", 'r') as file:
+        with open(f"{dir}/scripts/configs/config.yaml", 'r') as file:
             cfg = OmegaConf.load(file)
         self.dataloader = VSRDataLoader(subset="test", convert_gray=False)
         self.modelmodule = ModelModule(cfg, mode="infer")
@@ -86,7 +85,7 @@ class InferencePipeline(torch.nn.Module):
         if self.modality in ['video', 'audiovisual']:
             landmarks, bboxes = self.detector.detect(video_frames)
         data = self.dataloader.process_data(video_frames=video_frames, landmarks=landmarks)
-        transcript = self.modelmodule(data)
+        transcript = self.modelmodule(data.unsqueeze(0))
         
         if landmarks is not None:
             print(video_frames.shape, self.dataloader.color_roi.shape)
@@ -103,7 +102,7 @@ class InferencePipeline(torch.nn.Module):
         if self.modality in ['video', 'audiovisual']:
             landmarks, bboxes = self.detector.detect(video_frames)
         data = self.dataloader.process_data(video_frames=video_frames, landmarks=landmarks)
-        transcript = self.model.infer(data)
+        transcript = self.model.infer(data.unsqueeze(0))
         if landmarks is not None:
             print(video_frames.shape, self.dataloader.color_roi.shape)
             output_video = overlay_roi(video_frames, self.dataloader.color_roi.permute(0,2,3,1).numpy(), bboxes)
